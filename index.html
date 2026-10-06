@@ -1,0 +1,280 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <title>Climate Change: Time Travel</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    
+    <style>
+      #start-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(5, 5, 5, 0.98); color: white;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        z-index: 9999; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center;
+      }
+      #start-button {
+        padding: 15px 40px; font-size: 18px; background-color: #ffffff;
+        color: #000000; border: none; border-radius: 4px; cursor: pointer;
+        margin-top: 30px; font-weight: 600; letter-spacing: 2px; transition: 0.3s;
+      }
+      #start-button:hover { background-color: #cccccc; }
+      
+      .title-main { font-weight: 300; font-size: 32px; letter-spacing: 3px; margin-bottom: 5px; }
+      .title-sub { font-weight: 300; font-size: 16px; color: #888; letter-spacing: 2px; }
+    </style>
+
+    <script>
+      var sceneTexts = {
+        '#vid1': {
+          en: "In the pre-industrial era, the atmospheric carbon dioxide (CO\u2082) balance was maintained by natural carbon sinks. Forests and oceans formed a stable, self-renewing cycle supporting biodiversity.",
+          tr: "(Sanayi oncesi donemde atmosferdeki karbondioksit (CO\u2082) dengesi, dogal karbon yutaklari tarafindan korunmaktaydi. Ormanlar ve okyanuslar, biyocesitliligi destekleyen stabil ve kendi kendini yenileyen bir dongu olusturuyordu.)"
+        },
+        '#vid2': {
+          en: "Fossil fuel consumption and deforestation have significantly increased the concentration of atmospheric greenhouse gases (CO\u2082, CH\u2084, NO\u2082). This elevates global temperatures, weakening the natural defense mechanisms of ecosystems.",
+          tr: "(Fosil yakit kullanimi ve ormansizlasma, atmosferik sera gazi (CO\u2082, CH\u2084, NO\u2082) konsantrasyonunu belirgin sekilde artirmistir. Bu durum kuresel sicakliklari yukselterek ekosistemlerin dogal savunma mekanizmalarini zayiflatmaktadir.)"
+        },
+        '#vid3': {
+          en: "The continuation of current emission rates may accelerate soil erosion and the reduction of freshwater resources. The shrinking of natural habitats has the potential to severely compromise the living conditions of many species.",
+          tr: "(Mevcut emisyon oranlarinin ayni hizla devam etmesi, toprak erozyonunu ve su kaynaklarinin azalmasini hizlandirabilir. Dogal habitatlarin daralmasi, bircok canli turunun yasam kosullarini tehlikeye atma potansiyeline sahiptir.)"
+        },
+        '#vid4': {
+          en: "Carbon footprints can be reduced through renewable energy policies, recycling, and active reforestation. Taking conscious steps will restore ecological balance, ensuring a sustainable harmony with nature.",
+          tr: "(Yenilenebilir enerji politikalari, geri donusum ve aktif agaclandirma calismalari ile karbon ayak izi dusurulebilir. Bilincli adimlar atmak, ekolojik dengeyi onararak doga ile surdurulebilir bir uyum saglayacaktir.)"
+        }
+      };
+
+      function startExperience() {
+        var videos = document.querySelectorAll('.vr-video');
+        videos.forEach(function(vid) {
+          vid.play().then(() => { vid.pause(); vid.currentTime = 0; }).catch(e => console.log(e));
+        });
+        document.getElementById('start-screen').style.display = 'none';
+      }
+
+      AFRAME.registerComponent('video-controller', {
+        schema: { targetVideo: { type: 'string' } },
+        init: function () {
+          var el = this.el;
+          var targetVidId = this.data.targetVideo; 
+          
+          el.addEventListener('mouseenter', function () {
+            el.querySelector('.panel-bg').setAttribute('color', '#1a1a1a');
+            el.querySelector('.panel-border').setAttribute('opacity', '0.6');
+            el.setAttribute('animation', {property: 'scale', to: '1.03 1.03 1.03', dur: 250});
+          });
+          el.addEventListener('mouseleave', function () {
+            el.querySelector('.panel-bg').setAttribute('color', '#000000');
+            el.querySelector('.panel-border').setAttribute('opacity', '0.2');
+            el.setAttribute('animation', {property: 'scale', to: '1 1 1', dur: 250});
+          });
+          
+          el.addEventListener('click', function () {
+            // Ana menuyu gokyuzune firlat (sakla)
+            document.querySelector('#hub-entities').setAttribute('position', '0 9999 0');
+            
+            // Videoyu baslat
+            var sphere = document.querySelector('#main-videosphere');
+            sphere.setAttribute('src', targetVidId);
+            sphere.setAttribute('radius', '100'); 
+            
+            // Geri don butonunu asagiya getir (goster)
+            document.querySelector('#back-button-entity').setAttribute('position', '0 -0.8 -2.2');
+            
+            // Hotspot'u goster (Panel kapali kalacak)
+            document.querySelector('#hotspot-entity').setAttribute('position', '1.5 1.2 -3');
+            document.querySelector('#info-panel-entity').setAttribute('position', '0 9999 0');
+            
+            // Metinleri guncelle
+            var enText = document.querySelector('#info-text-en');
+            var trText = document.querySelector('#info-text-tr');
+            if(enText && trText && sceneTexts[targetVidId]) {
+              enText.setAttribute('value', sceneTexts[targetVidId].en);
+              trText.setAttribute('value', sceneTexts[targetVidId].tr);
+            }
+
+            // ESKI VE SORUNSUZ VIDEO CALISTIRMA KODU
+            var videoElement = document.querySelector(targetVidId);
+            videoElement.currentTime = 0;
+            videoElement.play();
+          });
+        }
+      });
+
+      AFRAME.registerComponent('back-button-logic', {
+        init: function () {
+          var el = this.el;
+          el.addEventListener('mouseenter', function () {
+            el.querySelector('.btn-bg').setAttribute('color', '#333333');
+            el.querySelector('.text-en').setAttribute('color', '#ffffff');
+          });
+          el.addEventListener('mouseleave', function () {
+            el.querySelector('.btn-bg').setAttribute('color', '#222222');
+            el.querySelector('.text-en').setAttribute('color', '#aaaaaa');
+          });
+          
+          el.addEventListener('click', function () {
+            // Videolari durdur
+            var videos = document.querySelectorAll('.vr-video');
+            videos.forEach(function(vid) { vid.pause(); });
+
+            document.querySelector('#main-videosphere').setAttribute('radius', '0.001');
+            
+            // Arayuzleri gokyuzune firlat (sakla)
+            document.querySelector('#back-button-entity').setAttribute('position', '0 9999 0');
+            document.querySelector('#hotspot-entity').setAttribute('position', '0 9999 0');
+            document.querySelector('#info-panel-entity').setAttribute('position', '0 9999 0');
+
+            // Ana menuyu geri getir
+            document.querySelector('#hub-entities').setAttribute('position', '0 0 0');
+          });
+        }
+      });
+
+      AFRAME.registerComponent('hotspot-interactions', {
+        init: function () {
+          var el = this.el;
+          el.addEventListener('mouseenter', function () { el.setAttribute('scale', '1.2 1.2 1.2'); });
+          el.addEventListener('mouseleave', function () { el.setAttribute('scale', '1 1 1'); });
+          el.addEventListener('click', function () {
+            // Paneli goster, Hotspot'u sakla
+            document.querySelector('#info-panel-entity').setAttribute('position', '0 1.5 -2.5');
+            document.querySelector('#hotspot-entity').setAttribute('position', '0 9999 0');
+          });
+        }
+      });
+
+      AFRAME.registerComponent('close-panel-logic', {
+        init: function () {
+          this.el.addEventListener('mouseenter', function () { this.el.setAttribute('scale', '1.1 1.1 1.1'); });
+          this.el.addEventListener('mouseleave', function () { this.el.setAttribute('scale', '1 1 1'); });
+          this.el.addEventListener('click', function () {
+            // Paneli sakla, Hotspot'u goster
+            document.querySelector('#info-panel-entity').setAttribute('position', '0 9999 0');
+            document.querySelector('#hotspot-entity').setAttribute('position', '1.5 1.2 -3');
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+    
+    <div id="start-screen">
+      <div class="title-main">CLIMATE CHANGE: A JOURNEY THROUGH TIME</div>
+      <div class="title-sub">IKLIM DEGISIKLIGI: BIR ZAMAN YOLCULUGU</div>
+      <button id="start-button" onclick="startExperience()">ENTER / GIRIS YAP</button>
+    </div>
+
+    <!-- Masaustu ekranlar icin sabit sag alt kose imzasi -->
+    <div style="position: fixed; bottom: 10px; right: 15px; color: rgba(255,255,255,0.25); font-family: 'Segoe UI', sans-serif; font-size: 11px; z-index: 9999; pointer-events: none; letter-spacing: 1px;">
+      by Nesretullah SATAR
+    </div>
+
+    <a-scene cursor="rayOrigin: mouse">
+      
+      <a-assets timeout="10000">
+        <img id="orman-bg" src="orman.jpg">
+        <video id="vid1" class="vr-video" src="video1.mp4" preload="auto" playsinline webkit-playsinline loop="true"></video>
+        <video id="vid2" class="vr-video" src="video2.mp4" preload="auto" playsinline webkit-playsinline loop="true"></video>
+        <video id="vid3" class="vr-video" src="video3.mp4" preload="auto" playsinline webkit-playsinline loop="true"></video>
+        <video id="vid4" class="vr-video" src="video4.mp4" preload="auto" playsinline webkit-playsinline loop="true"></video>
+      </a-assets>
+
+      <a-entity id="camera-rig">
+        <a-camera position="0 1.6 0"></a-camera>
+        <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 20"></a-entity>
+        <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 20"></a-entity>
+      </a-entity>
+
+      <!-- ANA MENU (HUB) -->
+      <!-- Baslangicta gorunur (0 0 0) -->
+      <a-entity id="hub-entities" position="0 0 0">
+        <a-sky src="#orman-bg" rotation="0 -90 0" color="#555555"></a-sky>
+        <a-light type="ambient" color="#FFF" intensity="1.0"></a-light>
+
+        <a-entity position="0 3.3 -4">
+          <a-text value="CLIMATE CHANGE: A JOURNEY THROUGH TIME" align="center" position="0 0.5 0" width="7" wrap-count="42" color="#FFFFFF"></a-text>
+          <a-text value="IKLIM DEGISIKLIGI: BIR ZAMAN YOLCULUGU" align="center" position="0 0.1 0" width="7" wrap-count="70" color="#AAAAAA"></a-text>
+        </a-entity>
+
+        <a-entity position="0 1.4 0">
+          
+          <a-entity position="-4.0 0 -3.2" rotation="0 40 0" video-controller="targetVideo: #vid1" class="clickable">
+            <a-plane class="panel-bg" width="2.6" height="1.6" color="#000000" opacity="0.8" material="shader: flat"></a-plane>
+            <a-plane class="panel-border" width="2.62" height="1.62" color="#FFFFFF" opacity="0.2" position="0 0 -0.01" material="shader: flat"></a-plane>
+            <a-text value="THE PAST" align="center" position="0 0.45 0.01" width="2.4" wrap-count="15" color="#FFFFFF"></a-text>
+            <a-text value="GECMIS" align="center" position="0 0.15 0.01" width="2.4" wrap-count="40" color="#888888"></a-text>
+            <a-plane width="1.6" height="0.01" color="#555" position="0 -0.05 0.01"></a-plane>
+            <a-text value="Pristine Ecosystem" align="center" position="0 -0.25 0.01" width="2.4" wrap-count="25" color="#73C6B6"></a-text>
+            <a-text value="Bozulmamis Ekosistem" align="center" position="0 -0.5 0.01" width="2.4" wrap-count="45" color="#73C6B6" opacity="0.7"></a-text>
+          </a-entity>
+
+          <a-entity position="-1.35 0 -4" rotation="0 15 0" video-controller="targetVideo: #vid2" class="clickable">
+            <a-plane class="panel-bg" width="2.6" height="1.6" color="#000000" opacity="0.8" material="shader: flat"></a-plane>
+            <a-plane class="panel-border" width="2.62" height="1.62" color="#FFFFFF" opacity="0.2" position="0 0 -0.01" material="shader: flat"></a-plane>
+            <a-text value="THE PRESENT" align="center" position="0 0.45 0.01" width="2.4" wrap-count="18" color="#FFFFFF"></a-text>
+            <a-text value="GUNUMUZ" align="center" position="0 0.15 0.01" width="2.4" wrap-count="40" color="#888888"></a-text>
+            <a-plane width="1.6" height="0.01" color="#555" position="0 -0.05 0.01"></a-plane>
+            <a-text value="Environmental Degradation" align="center" position="0 -0.25 0.01" width="2.4" wrap-count="28" color="#E59866"></a-text>
+            <a-text value="Cevresel Tahribat" align="center" position="0 -0.5 0.01" width="2.4" wrap-count="45" color="#E59866" opacity="0.7"></a-text>
+          </a-entity>
+
+          <a-entity position="1.35 0 -4" rotation="0 -15 0" video-controller="targetVideo: #vid3" class="clickable">
+            <a-plane class="panel-bg" width="2.6" height="1.6" color="#000000" opacity="0.8" material="shader: flat"></a-plane>
+            <a-plane class="panel-border" width="2.62" height="1.62" color="#FFFFFF" opacity="0.2" position="0 0 -0.01" material="shader: flat"></a-plane>
+            <a-text value="ALTERNATIVE FUTURE" align="center" position="0 0.45 0.01" width="2.4" wrap-count="20" color="#FFFFFF"></a-text>
+            <a-text value="ALTERNATIF GELECEK" align="center" position="0 0.15 0.01" width="2.4" wrap-count="40" color="#888888"></a-text>
+            <a-plane width="1.6" height="0.01" color="#555" position="0 -0.05 0.01"></a-plane>
+            <a-text value="Ecological Collapse" align="center" position="0 -0.25 0.01" width="2.4" wrap-count="25" color="#E74C3C"></a-text>
+            <a-text value="Ekolojik Cokus" align="center" position="0 -0.5 0.01" width="2.4" wrap-count="45" color="#E74C3C" opacity="0.7"></a-text>
+          </a-entity>
+
+          <a-entity position="4.0 0 -3.2" rotation="0 -40 0" video-controller="targetVideo: #vid4" class="clickable">
+            <a-plane class="panel-bg" width="2.6" height="1.6" color="#000000" opacity="0.8" material="shader: flat"></a-plane>
+            <a-plane class="panel-border" width="2.62" height="1.62" color="#FFFFFF" opacity="0.2" position="0 0 -0.01" material="shader: flat"></a-plane>
+            <a-text value="HOPEFUL FUTURE" align="center" position="0 0.45 0.01" width="2.4" wrap-count="18" color="#FFFFFF"></a-text>
+            <a-text value="UMUT VEREN GELECEK" align="center" position="0 0.15 0.01" width="2.4" wrap-count="40" color="#888888"></a-text>
+            <a-plane width="1.6" height="0.01" color="#555" position="0 -0.05 0.01"></a-plane>
+            <a-text value="Sustainable Harmony" align="center" position="0 -0.25 0.01" width="2.4" wrap-count="25" color="#5DADE2"></a-text>
+            <a-text value="Surdurulebilir Yasam" align="center" position="0 -0.5 0.01" width="2.4" wrap-count="45" color="#5DADE2" opacity="0.7"></a-text>
+          </a-entity>
+
+        </a-entity>
+      </a-entity>
+
+      <!-- 360 VİDEO KÜRESİ -->
+      <a-videosphere id="main-videosphere" src="#vid1" radius="0.001" rotation="0 -90 0"></a-videosphere>
+
+      <!-- BİLGİ SİSTEMİ (Baslangicta gokyuzunde gizli) -->
+      <!-- Hotspot -->
+      <a-entity id="hotspot-entity" position="0 9999 0" class="clickable" hotspot-interactions>
+        <a-ring color="#3498db" radius-inner="0.12" radius-outer="0.16" opacity="0.7" material="shader: flat" animation="property: scale; to: 1.2 1.2 1.2; dir: alternate; dur: 800; loop: true"></a-ring>
+        <a-circle color="#000000" radius="0.1" opacity="0.7" material="shader: flat"></a-circle>
+        <a-text value="i" color="#FFFFFF" align="center" position="0 0 0.01" width="2.5"></a-text>
+        <a-circle radius="0.3" opacity="0.0" material="shader: flat; transparent: true"></a-circle>
+      </a-entity>
+
+      <!-- Info Panel -->
+      <a-entity id="info-panel-entity" position="0 9999 0">
+        <a-plane width="3.4" height="1.6" color="#000000" opacity="0.85" material="shader: flat"></a-plane>
+        <a-plane width="3.42" height="1.62" color="#FFFFFF" opacity="0.2" position="0 0 -0.01" material="shader: flat"></a-plane>
+        <a-text id="info-text-en" value="..." align="center" position="0 0.25 0.01" width="3" wrap-count="38" color="#FFFFFF"></a-text>
+        <a-text id="info-text-tr" value="..." align="center" position="0 -0.3 0.01" width="2.6" wrap-count="50" color="#AAAAAA"></a-text>
+        
+        <a-entity position="1.5 0.6 0.02" class="clickable" close-panel-logic>
+          <a-circle radius="0.12" color="#333333" material="shader: flat"></a-circle>
+          <a-text value="X" align="center" position="0 0 0.01" width="2" color="#FFFFFF"></a-text>
+          <a-circle radius="0.25" opacity="0.0" material="shader: flat; transparent: true"></a-circle>
+        </a-entity>
+      </a-entity>
+
+      <!-- GERİ DÖN BUTONU (Baslangicta gokyuzunde gizli) -->
+      <a-entity id="back-button-entity" position="0 9999 0" rotation="-15 0 0" class="clickable" back-button-logic>
+        <a-plane class="btn-bg" width="2.4" height="0.6" color="#222222" opacity="0.95" material="shader: flat"></a-plane>
+        <a-plane width="2.42" height="0.62" color="#FFFFFF" opacity="0.3" position="0 0 -0.01" material="shader: flat"></a-plane>
+        <a-text class="text-en" value="EXIT VIDEO AND RETURN TO HUB" align="center" position="0 0.15 0.01" width="2.2" wrap-count="28" color="#ffffff"></a-text>
+        <a-text value="(VIDEODAN CIK VE ANA EKRANA DON)" align="center" position="0 -0.15 0.01" width="2.2" wrap-count="45" color="#aaaaaa"></a-text>
+      </a-entity>
+
+    </a-scene>
+  </body>
+</html>
