@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
   <head>
     <meta charset="utf-8">
@@ -181,8 +181,8 @@
 
       <a-entity id="camera-rig">
         <a-camera position="0 1.6 0"></a-camera>
-        <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 20"></a-entity>
-        <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 20"></a-entity>
+        <a-entity laser-controls="hand: left" raycaster="objects: .clickable, .clickable *; far: 20"></a-entity>
+        <a-entity laser-controls="hand: right" raycaster="objects: .clickable, .clickable *; far: 20"></a-entity>
       </a-entity>
 
       <!-- ANA MENU (HUB) -->
